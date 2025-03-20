@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أسعار عيادة تجديد | Tagded Clinic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4e54c8;
+            --secondary-color: #8f5cfd;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8faff;
+            padding: 16px;
+            max-width: 100%;
+            color: #333;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        
+        header {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        
+        .logo {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            display: inline-block;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 12px rgba(78, 84, 200, 0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: var(--primary-color);
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .price-list {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        .free-check {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 16px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+        
+        .price-item {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .price-item:nth-child(2) { animation-delay: 0.1s; }
+        .price-item:nth-child(3) { animation-delay: 0.2s; }
+        .price-item:nth-child(4) { animation-delay: 0.3s; }
+        .price-item:nth-child(5) { animation-delay: 0.4s; }
+        .price-item:nth-child(6) { animation-delay: 0.5s; }
+        .price-item:nth-child(7) { animation-delay: 0.6s; }
+        
+        .price-item:last-child {
+            border-bottom: none;
+        }
+        
+        .price-item:hover, .price-item:active {
+            background-color: #f5f8ff;
+            transform: translateY(-2px) scale(1.02);
+        }
+        
+        .service-name {
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+        
+        .price-tag {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        
+        .price-item:hover .price-tag, .price-item:active .price-tag {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(78, 84, 200, 0.3);
+        }
+        
+        /* Particles */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.03);
+                opacity: 0.9;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-6px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes shine {
+            0% {
+                background-position: -100% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+        
+        /* Shine effect on hover */
+        .price-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+            background-size: 200% 100%;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .price-item:hover::after {
+            opacity: 1;
+            animation: shine 1s;
+        }
+        
+        /* Floating bubbles */
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(143, 92, 253, 0.2));
+            box-shadow: 0 0 10px rgba(143, 92, 253, 0.3);
+            animation: float-bubble 6s ease-in-out infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        @keyframes float-bubble {
+            0% {
+                transform: translateY(0) translateX(0);
+            }
+            50% {
+                transform: translateY(-20px) translateX(10px);
+            }
+            100% {
+                transform: translateY(0) translateX(0);
+            }
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--primary-color);
+            font-size: 14px;
+            opacity: 0.8;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Media Queries */
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+            
+            .logo {
+                font-size: 24px;
+                padding: 10px 20px;
+            }
+            
+            .subtitle {
+                font-size: 16px;
+            }
+            
+            .free-check {
+                font-size: 18px;
+                padding: 14px;
+            }
+            
+            .service-name {
+                font-size: 16px;
+            }
+            
+            .price-tag {
+                padding: 4px 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+    
+    <!-- Floating Bubbles -->
+    <div class="bubble" style="width: 80px; height: 80px; top: 10%; left: 5%; animation-delay: 0s;"></div>
+    <div class="bubble" style="width: 40px; height: 40px; top: 20%; right: 10%; animation-delay: 1s;"></div>
+    <div class="bubble" style="width: 60px; height: 60px; top: 50%; left: 8%; animation-delay: 2s;"></div>
+    <div class="bubble" style="width: 30px; height: 30px; top: 30%; right: 20%; animation-delay: 3s;"></div>
+    <div class="bubble" style="width: 50px; height: 50px; top: 70%; right: 5%; animation-delay: 1.5s;"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">عيادة تجدد</div>
+            <div class="subtitle">للعلاج الطبيعي وإعادة التأهيل</div>
+        </header>
+        
+        <div class="price-list">
+            <div class="free-check">الكشف مجاني في جميع فروعنا!</div>
+            
+            <div class="price-item">
+                <div class="service-name">جلسة علاج طبيعي</div>
+                <div class="price-tag">150 ريال</div>
+            </div>
+            
+            <div class="price-item">
+                <div class="service-name">جلسة تدليك</div>
+                <div class="price-tag">200 ريال</div>
+            </div>
+            
+            <div class="price-item">
+                <div class="service-name">جلسة كهرباء</div>
+                <div class="price-tag">100 ريال</div>
+            </div>
+            
+            <div class="price-item">
+                <div class="service-name">جلسة الدم</div>
+                <div class="price-tag">300 ريال</div>
+            </div>
+            
+            <div class="price-item">
+                <div class="service-name">جلسة العضل</div>
+                <div class="price-tag">250 ريال</div>
+            </div>
+            
+            <div class="price-item">
+                <div class="service-name">جلسة الدم + جلسة عضل</div>
+                <div class="price-tag">500 ريال</div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2025 عيادة تجدد - جميع الحقوق محفوظة</p>
+        </footer>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Initialize particles.js
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 30,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#8f5cfd"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.3,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 5,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 40,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#4e54c8",
+                        "opacity": 0.2,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 0.5
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+        });
+    </script>
+</body>
+</html>
