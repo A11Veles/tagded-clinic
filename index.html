@@ -5,6 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>أسعار عيادات تجديد | Tagded Health Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Price variables and discount calculator script -->
+    <script>
+        // All clinic prices defined here for easy editing
+        const PRICES = {
+            analSession: "650",
+            bloodAndMuscleSession: "1690",
+            localSession: "475",
+            muscleSession: "370",
+            bagSession: "475",
+            earSession: "475"
+        };
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize original prices
+            document.getElementById('price-anal').textContent = PRICES.analSession + " ج.م";
+            document.getElementById('price-blood-muscle').textContent = PRICES.bloodAndMuscleSession + " ج.م";
+            document.getElementById('price-local').textContent = PRICES.localSession + " ج.م";
+            document.getElementById('price-muscle').textContent = PRICES.muscleSession + " ج.م";
+            document.getElementById('price-bag').textContent = PRICES.bagSession + " ج.م";
+            document.getElementById('price-ear').textContent = PRICES.earSession + " ج.م";
+            
+            // Set up discount selector
+            const discountSelector = document.getElementById('discount-selector');
+            
+            // Apply discount when selection changes
+            discountSelector.addEventListener('change', function() {
+                const discountPercentage = parseInt(this.value);
+                applyDiscount(discountPercentage);
+            });
+            
+            // Initial call with 0% discount
+            applyDiscount(0);
+        });
+        
+        // Function to apply discount to all prices
+        function applyDiscount(discountPercentage) {
+            // Update the discount percentage display
+            document.getElementById('discount-percentage').textContent = discountPercentage + '%';
+            
+            // Show or hide discount message based on percentage
+            const discountMessage = document.getElementById('discount-message');
+            if (discountPercentage > 0) {
+                discountMessage.style.display = 'block';
+            } else {
+                discountMessage.style.display = 'none';
+            }
+            
+            // Calculate and display discounted prices for each service
+            updateDiscountedPrice('price-anal', 'discount-anal', PRICES.analSession, discountPercentage);
+            updateDiscountedPrice('price-blood-muscle', 'discount-blood-muscle', PRICES.bloodAndMuscleSession, discountPercentage);
+            updateDiscountedPrice('price-local', 'discount-local', PRICES.localSession, discountPercentage);
+            updateDiscountedPrice('price-muscle', 'discount-muscle', PRICES.muscleSession, discountPercentage);
+            updateDiscountedPrice('price-bag', 'discount-bag', PRICES.bagSession, discountPercentage);
+            updateDiscountedPrice('price-ear', 'discount-ear', PRICES.earSession, discountPercentage);
+        }
+        
+        // Helper function to update a single discounted price
+        function updateDiscountedPrice(originalPriceId, discountedPriceId, originalPrice, discountPercentage) {
+            const originalPriceElement = document.getElementById(originalPriceId);
+            const discountedPriceElement = document.getElementById(discountedPriceId);
+            
+            const numericPrice = parseInt(originalPrice);
+            const discountedPrice = Math.round(numericPrice * (100 - discountPercentage) / 100);
+            
+            if (discountPercentage > 0) {
+                // Apply "old price" styling to original price
+                originalPriceElement.classList.add('old-price');
+                // Show the discounted price
+                discountedPriceElement.textContent = discountedPrice + " ج.م";
+                discountedPriceElement.style.display = 'inline-block';
+            } else {
+                // Remove "old price" styling
+                originalPriceElement.classList.remove('old-price');
+                // Hide the discounted price
+                discountedPriceElement.style.display = 'none';
+            }
+        }
+    </script>
+    
     <style>
         :root {
             --primary-color: #4e54c8;
@@ -121,6 +201,80 @@
         .price-item:hover .price-tag, .price-item:active .price-tag {
             transform: scale(1.1);
             box-shadow: 0 4px 8px rgba(78, 84, 200, 0.3);
+        }
+        
+        /* Discount Styles */
+        .discount-selector {
+            margin: 0 auto 16px;
+            text-align: center;
+            padding: 16px;
+            background: white;
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
+        }
+        
+        .discount-selector label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-left: 8px;
+        }
+        
+        .discount-selector select {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 2px solid var(--primary-color);
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .discount-message {
+            margin-top: 8px;
+            color: #e91e63;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+            display: none;
+        }
+        
+        .price-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .old-price {
+            position: relative;
+            opacity: 0.7;
+            margin-left: 8px;
+        }
+        
+        .old-price::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e91e63;
+            transform: rotate(-10deg);
+        }
+        
+        .discounted-price {
+            background: linear-gradient(135deg, #e91e63 0%, #ff9800 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-weight: 700;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+        
+        .trademark {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #999;
         }
         
         /* Particles */
@@ -303,36 +457,82 @@
         <div class="price-list">
             <div class="free-check">الكشف مجاني في جميع فروعنا!</div>
             
+            <!-- Discount Selector -->
+            <div class="discount-selector">
+                <label for="discount-selector">اختر الخصم:</label>
+                <select id="discount-selector">
+                    <option value="0">0%</option>
+                    <option value="5">5%</option>
+                    <option value="10">10%</option>
+                    <option value="15">15%</option>
+                    <option value="20">20%</option>
+                    <option value="25">25%</option>
+                    <option value="30">30%</option>
+                    <option value="35">35%</option>
+                    <option value="40">40%</option>
+                    <option value="45">45%</option>
+                    <option value="50">50%</option>
+                    <option value="55">55%</option>
+                    <option value="60">60%</option>
+                    <option value="65">65%</option>
+                    <option value="70">70%</option>
+                </select>
+                <div id="discount-message" class="discount-message">
+                    خصم <span id="discount-percentage">0%</span> على جميع الخدمات!
+                </div>
+            </div>
+            
             <div class="price-item">
                 <div class="service-name">جلسة الشرجي</div>
-                <div class="price-tag">650 ج.م</div>
+                <div class="price-container">
+                    <div class="price-tag" id="price-anal">650 ج.م</div>
+                    <div class="discounted-price" id="discount-anal"></div>
+                </div>
             </div>
             
             <div class="price-item">
                 <div class="service-name">الدم وعليها جلسة عضل</div>
-                <div class="price-tag">1690 ج.م</div>
+                <div class="price-container">
+                    <div class="price-tag" id="price-blood-muscle">1690 ج.م</div>
+                    <div class="discounted-price" id="discount-blood-muscle"></div>
+                </div>
             </div>
             
             <div class="price-item">
                 <div class="service-name">جلسة الموضعي</div>
-                <div class="price-tag">475 ج.م</div>
+                <div class="price-container">
+                    <div class="price-tag" id="price-local">475 ج.م</div>
+                    <div class="discounted-price" id="discount-local"></div>
+                </div>
             </div>
             
             <div class="price-item">
                 <div class="service-name">جلسة العضل</div>
-                <div class="price-tag">370 ج.م</div>
+                <div class="price-container">
+                    <div class="price-tag" id="price-muscle">370 ج.م</div>
+                    <div class="discounted-price" id="discount-muscle"></div>
+                </div>
             </div>
             
             <div class="price-item">
                 <div class="service-name">جلسة الباج</div>
-                <div class="price-tag">475 ج.م</div>
+                <div class="price-container">
+                    <div class="price-tag" id="price-bag">475 ج.م</div>
+                    <div class="discounted-price" id="discount-bag"></div>
+                </div>
             </div>
             
             <div class="price-item">
                 <div class="service-name">جلسة الأذن</div>
-                <div class="price-tag">475 ج.م</div>
+                <div class="price-container">
+                    <div class="price-tag" id="price-ear">475 ج.م</div>
+                    <div class="discounted-price" id="discount-ear"></div>
+                </div>
             </div>
         </div>
+        
+        <!-- Trademark -->
+        <div class="trademark"> Veles 2025 - جميع الحقوق محفوظة</div>
     </div>
     
     <!-- Particles.js -->
