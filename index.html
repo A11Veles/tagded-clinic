@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أسعار عيادة تجديد | Tagded Clinic</title>
+    <title>أسعار عيادة تجديد | Tagded Health Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -201,14 +201,20 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: skewX(-25deg);
             background-size: 200% 100%;
+            background-position: -100% 0;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
         }
         
-        .price-item:hover::after {
+        .price-item:hover::after, .price-item:active::after {
             opacity: 1;
             animation: shine 1s;
         }
@@ -217,63 +223,63 @@
         .bubble {
             position: absolute;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(143, 92, 253, 0.2));
-            box-shadow: 0 0 10px rgba(143, 92, 253, 0.3);
-            animation: float-bubble 6s ease-in-out infinite;
+            background: linear-gradient(135deg, rgba(78, 84, 200, 0.1) 0%, rgba(143, 92, 253, 0.1) 100%);
+            animation: float-bubble 8s infinite ease-in-out;
             z-index: 0;
             pointer-events: none;
+        }
+        
+        .bubble:nth-child(1) {
+            width: 60px;
+            height: 60px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+            animation-duration: 9s;
+        }
+        
+        .bubble:nth-child(2) {
+            width: 40px;
+            height: 40px;
+            top: 20%;
+            right: 15%;
+            animation-delay: 1s;
+            animation-duration: 7s;
+        }
+        
+        .bubble:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            bottom: 15%;
+            left: 5%;
+            animation-delay: 2s;
+            animation-duration: 10s;
+        }
+        
+        .bubble:nth-child(4) {
+            width: 50px;
+            height: 50px;
+            bottom: 10%;
+            right: 10%;
+            animation-delay: 3s;
+            animation-duration: 8s;
         }
         
         @keyframes float-bubble {
             0% {
                 transform: translateY(0) translateX(0);
             }
-            50% {
+            25% {
                 transform: translateY(-20px) translateX(10px);
+            }
+            50% {
+                transform: translateY(0) translateX(20px);
+            }
+            75% {
+                transform: translateY(20px) translateX(10px);
             }
             100% {
                 transform: translateY(0) translateX(0);
-            }
-        }
-        
-        /* Footer */
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            color: var(--primary-color);
-            font-size: 14px;
-            opacity: 0.8;
-            position: relative;
-            z-index: 2;
-        }
-        
-        /* Media Queries */
-        @media (max-width: 480px) {
-            body {
-                padding: 12px;
-            }
-            
-            .logo {
-                font-size: 24px;
-                padding: 10px 20px;
-            }
-            
-            .subtitle {
-                font-size: 16px;
-            }
-            
-            .free-check {
-                font-size: 18px;
-                padding: 14px;
-            }
-            
-            .service-name {
-                font-size: 16px;
-            }
-            
-            .price-tag {
-                padding: 4px 10px;
-                font-size: 14px;
             }
         }
     </style>
@@ -283,58 +289,54 @@
     <div id="particles-js"></div>
     
     <!-- Floating Bubbles -->
-    <div class="bubble" style="width: 80px; height: 80px; top: 10%; left: 5%; animation-delay: 0s;"></div>
-    <div class="bubble" style="width: 40px; height: 40px; top: 20%; right: 10%; animation-delay: 1s;"></div>
-    <div class="bubble" style="width: 60px; height: 60px; top: 50%; left: 8%; animation-delay: 2s;"></div>
-    <div class="bubble" style="width: 30px; height: 30px; top: 30%; right: 20%; animation-delay: 3s;"></div>
-    <div class="bubble" style="width: 50px; height: 50px; top: 70%; right: 5%; animation-delay: 1.5s;"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
     
     <div class="container">
         <header>
             <div class="logo">عيادة تجدد</div>
-            <div class="subtitle">للعلاج الطبيعي وإعادة التأهيل</div>
+            <div class="subtitle">Tagded Clinic</div>
         </header>
         
         <div class="price-list">
             <div class="free-check">الكشف مجاني في جميع فروعنا!</div>
             
             <div class="price-item">
-                <div class="service-name">جلسة علاج طبيعي</div>
-                <div class="price-tag">150 ريال</div>
+                <div class="service-name">جلسة الشرجي</div>
+                <div class="price-tag">650 ج.م</div>
             </div>
             
             <div class="price-item">
-                <div class="service-name">جلسة تدليك</div>
-                <div class="price-tag">200 ريال</div>
+                <div class="service-name">الدم وعليها جلسة عضل</div>
+                <div class="price-tag">1690 ج.م</div>
             </div>
             
             <div class="price-item">
-                <div class="service-name">جلسة كهرباء</div>
-                <div class="price-tag">100 ريال</div>
-            </div>
-            
-            <div class="price-item">
-                <div class="service-name">جلسة الدم</div>
-                <div class="price-tag">300 ريال</div>
+                <div class="service-name">جلسة الموضعي</div>
+                <div class="price-tag">475 ج.م</div>
             </div>
             
             <div class="price-item">
                 <div class="service-name">جلسة العضل</div>
-                <div class="price-tag">250 ريال</div>
+                <div class="price-tag">370 ج.م</div>
             </div>
             
             <div class="price-item">
-                <div class="service-name">جلسة الدم + جلسة عضل</div>
-                <div class="price-tag">500 ريال</div>
+                <div class="service-name">جلسة الباج</div>
+                <div class="price-tag">475 ج.م</div>
+            </div>
+            
+            <div class="price-item">
+                <div class="service-name">جلسة الأذن</div>
+                <div class="price-tag">475 ج.م</div>
             </div>
         </div>
-        
-        <footer>
-            <p>© 2025 عيادة تجدد - جميع الحقوق محفوظة</p>
-        </footer>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <!-- Particles.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
     <script>
         // Initialize particles.js
         document.addEventListener('DOMContentLoaded', function() {
@@ -442,6 +444,31 @@
                     }
                 },
                 "retina_detect": true
+            });
+            
+            // Add tap/click effect on price items for mobile
+            const priceItems = document.querySelectorAll('.price-item');
+            
+            priceItems.forEach(item => {
+                item.addEventListener('touchstart', function() {
+                    this.style.transform = 'translateY(-4px) scale(1.03)';
+                    this.style.backgroundColor = '#f5f8ff';
+                    
+                    const priceTag = this.querySelector('.price-tag');
+                    priceTag.style.transform = 'scale(1.1)';
+                    priceTag.style.boxShadow = '0 4px 8px rgba(78, 84, 200, 0.3)';
+                });
+                
+                item.addEventListener('touchend', function() {
+                    setTimeout(() => {
+                        this.style.transform = '';
+                        this.style.backgroundColor = '';
+                        
+                        const priceTag = this.querySelector('.price-tag');
+                        priceTag.style.transform = '';
+                        priceTag.style.boxShadow = '';
+                    }, 300);
+                });
             });
         });
     </script>
