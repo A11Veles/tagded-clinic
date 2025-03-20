@@ -9,18 +9,21 @@
     <script>
         const PRICES = {
             rectalSession: "650",
+            // this is the price for major + minor
             major: "1690",
             localSession: "475",
-            minor: "370",
-            bagSession: "475"
+            minorSession: "370",
+            bagSession: "475",
+            earSession: "475"
         };
         
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('price-rectal').textContent = PRICES.rectalSession + " ج.م";
             document.getElementById('price-major').textContent = PRICES.major + " ج.م";
             document.getElementById('price-local').textContent = PRICES.localSession + " ج.م";
-            document.getElementById('price-muscle').textContent = PRICES.minor + " ج.م";
+            document.getElementById('price-minor').textContent = PRICES.minorSession + " ج.م";
             document.getElementById('price-bag').textContent = PRICES.bagSession + " ج.م";
+            document.getElementById('price-ear').textContent = PRICES.earSession + " ج.م";
             
             const discountSelector = document.getElementById('discount-selector');
             
@@ -45,8 +48,9 @@
             updateDiscountedPrice('price-rectal', 'discount-rectal', PRICES.rectalSession, discountPercentage);
             updateDiscountedPrice('price-major', 'discount-major', PRICES.major, discountPercentage);
             updateDiscountedPrice('price-local', 'discount-local', PRICES.localSession, discountPercentage);
-            updateDiscountedPrice('price-muscle', 'discount-muscle', PRICES.minor, discountPercentage);
+            updateDiscountedPrice('price-minor', 'discount-minor', PRICES.minorSession, discountPercentage);
             updateDiscountedPrice('price-bag', 'discount-bag', PRICES.bagSession, discountPercentage);
+            updateDiscountedPrice('price-ear', 'discount-ear', PRICES.earSession, discountPercentage);
         }
         
         function updateDiscountedPrice(originalPriceId, discountedPriceId, originalPrice, discountPercentage) {
@@ -154,6 +158,7 @@
         .price-item:nth-child(4) { animation-delay: 0.3s; }
         .price-item:nth-child(5) { animation-delay: 0.4s; }
         .price-item:nth-child(6) { animation-delay: 0.5s; }
+        .price-item:nth-child(7) { animation-delay: 0.6s; }
         
         .price-item:last-child {
             border-bottom: none;
@@ -451,42 +456,50 @@
             </div>
             
             <div class="price-item">
-                <div class="service-name">الجلسة الرئيسية</div>
+                <div class="service-name">الحجامة الموضعية</div>
                 <div class="price-container">
-                    <div class="price-tag" id="price-rectal">650 ج.م</div>
-                    <div class="discounted-price" id="discount-rectal"></div>
+                    <span class="price-tag" id="price-local">475 ج.م</span>
+                    <span class="discounted-price" id="discount-local"></span>
                 </div>
             </div>
             
             <div class="price-item">
-                <div class="service-name">جلسة الدم + جلسة عضل</div>
+                <div class="service-name">الحجامة العضلية</div>
                 <div class="price-container">
-                    <div class="price-tag" id="price-major">1690 ج.م</div>
-                    <div class="discounted-price" id="discount-major"></div>
+                    <span class="price-tag" id="price-minor">370 ج.م</span>
+                    <span class="discounted-price" id="discount-minor"></span>
                 </div>
             </div>
             
             <div class="price-item">
-                <div class="service-name">جلسة الموضعي</div>
+                <div class="service-name">الحجامة الشرجية</div>
                 <div class="price-container">
-                    <div class="price-tag" id="price-local">475 ج.م</div>
-                    <div class="discounted-price" id="discount-local"></div>
+                    <span class="price-tag" id="price-rectal">650 ج.م</span>
+                    <span class="discounted-price" id="discount-rectal"></span>
                 </div>
             </div>
             
             <div class="price-item">
-                <div class="service-name">جلسة العضل</div>
+                <div class="service-name">أكياس الدم والعضلات</div>
                 <div class="price-container">
-                    <div class="price-tag" id="price-muscle">370 ج.م</div>
-                    <div class="discounted-price" id="discount-muscle"></div>
+                    <span class="price-tag" id="price-major">1690 ج.م</span>
+                    <span class="discounted-price" id="discount-major"></span>
                 </div>
             </div>
             
             <div class="price-item">
-                <div class="service-name">جلسة الباج</div>
+                <div class="service-name">حجامة الكيس</div>
                 <div class="price-container">
-                    <div class="price-tag" id="price-bag">475 ج.م</div>
-                    <div class="discounted-price" id="discount-bag"></div>
+                    <span class="price-tag" id="price-bag">475 ج.م</span>
+                    <span class="discounted-price" id="discount-bag"></span>
+                </div>
+            </div>
+            
+            <div class="price-item">
+                <div class="service-name">حجامة الأذن</div>
+                <div class="price-container">
+                    <span class="price-tag" id="price-ear">475 ج.م</span>
+                    <span class="discounted-price" id="discount-ear"></span>
                 </div>
             </div>
         </div>
