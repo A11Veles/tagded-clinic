@@ -96,10 +96,10 @@
                     </select>
                 </td>
                 <td>
-                    <input type="number" class="price-input" placeholder="السعر" oninput="updateRowTotal('${rowId}')">
+                    <input type="number" class="price-input" placeholder="السعر" oninput="updateRowTotalFromElement(this)">
                 </td>
                 <td>
-                    <input type="number" class="quantity-input" placeholder="الكمية" min="1" value="1" oninput="updateRowTotal('${rowId}')">
+                    <input type="number" class="quantity-input" placeholder="الكمية" min="1" value="1" oninput="updateRowTotalFromElement(this)">
                 </td>
                 <td class="row-total">0 ج.م</td>
                 <td>
@@ -123,12 +123,12 @@
             if (sessionSelect.value) {
                 const discountedPrice = getDiscountedPrice(sessionSelect.value);
                 priceInput.value = discountedPrice;
-                updateRowTotal(rowId);
+                updateRowTotalFromElement(priceInput);
             }
         }
         
-        function updateRowTotal(rowId) {
-            const row = document.getElementById(rowId);
+        function updateRowTotalFromElement(element) {
+            const row = element.closest('.calculator-row');
             const priceInput = row.querySelector('.price-input');
             const quantityInput = row.querySelector('.quantity-input');
             const rowTotalElement = row.querySelector('.row-total');
@@ -138,20 +138,29 @@
             const total = price * quantity;
             
             rowTotalElement.textContent = total + ' ج.م';
-            updateGrandTotal();
+            
+            const container = row.closest('.calculator-section');
+            updateGrandTotal(container);
+        }
+
+        // Deprecated: use updateRowTotalFromElement instead
+        function updateRowTotal(rowId) {
+            const row = document.getElementById(rowId);
+            if (row) updateRowTotalFromElement(row.querySelector('.price-input'));
         }
         
         function deleteRow(rowId) {
             const row = document.getElementById(rowId);
+            const container = row.closest('.calculator-section');
             row.classList.add('row-disappear');
             setTimeout(() => {
                 row.remove();
-                updateGrandTotal();
+                updateGrandTotal(container);
             }, 300);
         }
         
-        function updateGrandTotal() {
-            const rows = document.querySelectorAll('.calculator-row');
+        function updateGrandTotal(container = document.querySelector('.calculator-section')) {
+            const rows = container.querySelectorAll('.calculator-row');
             let grandTotal = 0;
             
             rows.forEach(row => {
@@ -162,21 +171,214 @@
                 grandTotal += price * quantity;
             });
             
-            document.getElementById('grand-total').textContent = grandTotal + ' ج.م';
+            const totalDisplay = container.querySelector('[id^="grand-total"]');
+            if (totalDisplay) {
+                totalDisplay.textContent = grandTotal + ' ج.م';
+            }
         }
         
         function updateCalculatorPrices() {
-            const rows = document.querySelectorAll('.calculator-row');
-            rows.forEach(row => {
-                const sessionSelect = row.querySelector('.session-select');
-                const priceInput = row.querySelector('.price-input');
+            // Update all calculator sections (original + clones)
+            const allSections = document.querySelectorAll('.calculator-section');
+            allSections.forEach(section => {
+                const rows = section.querySelectorAll('.calculator-row');
+                rows.forEach(row => {
+                    const sessionSelect = row.querySelector('.session-select');
+                    const priceInput = row.querySelector('.price-input');
+                    
+                    if (sessionSelect.value) {
+                        const discountedPrice = getDiscountedPrice(sessionSelect.value);
+                        priceInput.value = discountedPrice;
+                        
+                        const quantityInput = row.querySelector('.quantity-input');
+                        const rowTotalElement = row.querySelector('.row-total');
+                        const price = parseFloat(priceInput.value) || 0;
+                        const quantity = parseInt(quantityInput.value) || 0;
+                        rowTotalElement.textContent = (price * quantity) + ' ج.م';
+                    }
+                });
+                updateGrandTotal(section);
+            });
+        }
+
+        function showVariations() {
+            const container = document.querySelector('.container');
+            const originalSection = document.querySelector('.calculator-section');
+            let wrapper = document.querySelector('.variations-wrapper');
+            const moreBtn = document.getElementById('more-variations-btn');
+            
+            if (!wrapper) {
+                wrapper = document.createElement('div');
+                wrapper.className = 'variations-wrapper';
+                originalSection.parentNode.insertBefore(wrapper, originalSection);
+            }
+            
+            wrapper.innerHTML = '';
+            container.classList.add('expanded-layout');
+            
+            // Create Opposite (Right)
+            const oppositeClone = createVariationClone(originalSection, 'opposite');
+            applyOppositeRule(oppositeClone);
+            
+            // Create Split (Left)
+            const splitClone = createVariationClone(originalSection, 'split');
+            applySplitRule(splitClone);
+            
+            // Arrange in DOM for RTL: [Opposite (Right), Original (Middle), Split (Left)]
+            const rightCol = document.createElement('div');
+            rightCol.className = 'variation-column';
+            rightCol.appendChild(oppositeClone);
+            
+            const middleCol = document.createElement('div');
+            middleCol.className = 'variation-column';
+            middleCol.appendChild(originalSection);
+            
+            const leftCol = document.createElement('div');
+            leftCol.className = 'variation-column';
+            leftCol.appendChild(splitClone);
+            
+            wrapper.appendChild(rightCol);
+            wrapper.appendChild(middleCol);
+            wrapper.appendChild(leftCol);
+            
+            // Disable button after click
+            moreBtn.disabled = true;
+            moreBtn.style.opacity = '0.5';
+            moreBtn.style.cursor = 'not-allowed';
+        }
+
+        function resetAll() {
+            const container = document.querySelector('.container');
+            const originalSection = document.querySelector('.calculator-section');
+            const wrapper = document.querySelector('.variations-wrapper');
+            const moreBtn = document.getElementById('more-variations-btn');
+            const discountSelector = document.getElementById('discount-selector');
+            
+            // Reset discount
+            discountSelector.value = "0";
+            currentDiscount = 0;
+            applyDiscount(0);
+            
+            // Clear rows in original table
+            const tableBody = document.getElementById('calculator-table-body');
+            tableBody.innerHTML = '';
+            updateGrandTotal(originalSection);
+            
+            // Remove variations and return original table to its spot
+            if (wrapper) {
+                wrapper.parentNode.insertBefore(originalSection, wrapper);
+                wrapper.remove();
+            }
+            
+            container.classList.remove('expanded-layout');
+            
+            // Re-enable "More Variations" button
+            moreBtn.disabled = false;
+            moreBtn.style.opacity = '1';
+            moreBtn.style.cursor = 'pointer';
+        }
+
+        function createVariationClone(original, type) {
+            const clone = original.cloneNode(true);
+            clone.classList.add('variation-clone');
+            
+            // Remove IDs to avoid duplicates
+            clone.removeAttribute('id');
+            const tableBody = clone.querySelector('#calculator-table-body');
+            if (tableBody) tableBody.id = 'table-body-' + type;
+            
+            const grandTotalValue = clone.querySelector('#grand-total');
+            if (grandTotalValue) grandTotalValue.id = 'grand-total-' + type;
+
+            // Clone input values (cloneNode doesn't do this for dynamic values)
+            const originalRows = original.querySelectorAll('.calculator-row');
+            const cloneRows = clone.querySelectorAll('.calculator-row');
+            
+            originalRows.forEach((origRow, index) => {
+                const cloneRow = cloneRows[index];
+                const origSelect = origRow.querySelector('.session-select');
+                const cloneSelect = cloneRow.querySelector('.session-select');
+                const origPrice = origRow.querySelector('.price-input');
+                const clonePrice = cloneRow.querySelector('.price-input');
+                const origQty = origRow.querySelector('.quantity-input');
+                const cloneQty = cloneRow.querySelector('.quantity-input');
                 
-                if (sessionSelect.value) {
-                    const discountedPrice = getDiscountedPrice(sessionSelect.value);
-                    priceInput.value = discountedPrice;
-                    updateRowTotal(row.id);
+                cloneSelect.value = origSelect.value;
+                clonePrice.value = origPrice.value;
+                cloneQty.value = origQty.value;
+                
+                // Remove row ID and update oninput/onchange to be empty or handle locally
+                cloneRow.removeAttribute('id');
+                cloneSelect.onchange = null;
+                clonePrice.oninput = null;
+                cloneQty.oninput = null;
+            });
+            
+            return clone;
+        }
+
+        function applyOppositeRule(clone) {
+            const rows = clone.querySelectorAll('.calculator-row');
+            rows.forEach(row => {
+                const select = row.querySelector('.session-select');
+                if (select.value === 'rectalSession') {
+                    select.value = 'major';
+                } else if (select.value === 'major') {
+                    select.value = 'rectalSession';
+                }
+                updateVariationRow(row);
+            });
+            updateGrandTotal(clone);
+        }
+
+        function applySplitRule(clone) {
+            const tableBody = clone.querySelector('tbody');
+            const rows = Array.from(tableBody.querySelectorAll('.calculator-row'));
+            
+            rows.forEach(row => {
+                const select = row.querySelector('.session-select');
+                const qtyInput = row.querySelector('.quantity-input');
+                const val = select.value;
+                const Q = parseInt(qtyInput.value) || 0;
+                
+                if ((val === 'rectalSession' || val === 'major') && Q > 0) {
+                    const q1 = Math.floor(Q / 2);
+                    const q2 = Q - q1;
+                    
+                    // Modify current row to be rectalSession
+                    select.value = 'rectalSession';
+                    qtyInput.value = q1;
+                    updateVariationRow(row);
+                    
+                    // Create new row for major
+                    const newRow = row.cloneNode(true);
+                    const newSelect = newRow.querySelector('.session-select');
+                    const newQtyInput = newRow.querySelector('.quantity-input');
+                    newSelect.value = 'major';
+                    newQtyInput.value = q2;
+                    
+                    // Insert after current row
+                    row.parentNode.insertBefore(newRow, row.nextSibling);
+                    updateVariationRow(newRow);
+                } else {
+                    updateVariationRow(row);
                 }
             });
+            updateGrandTotal(clone);
+        }
+
+        function updateVariationRow(row) {
+            const select = row.querySelector('.session-select');
+            const priceInput = row.querySelector('.price-input');
+            const qtyInput = row.querySelector('.quantity-input');
+            const rowTotal = row.querySelector('.row-total');
+            
+            if (select.value) {
+                const price = getDiscountedPrice(select.value);
+                priceInput.value = price;
+                const qty = parseInt(qtyInput.value) || 0;
+                rowTotal.textContent = (price * qty) + ' ج.م';
+            }
         }
     </script>
     
@@ -387,6 +589,13 @@
         .calculator-content {
             padding: 16px;
         }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 16px;
+            -webkit-overflow-scrolling: touch;
+        }
         
         .add-row-btn {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
@@ -446,14 +655,47 @@
             transform: translateX(-100%);
         }
         
+        .calculator-table th:nth-child(1),
+        .calculator-table td:nth-child(1) {
+            min-width: 180px;
+            text-align: right;
+        }
+
+        .calculator-table th:nth-child(2),
+        .calculator-table td:nth-child(2) {
+            min-width: 90px;
+        }
+
+        .calculator-table th:nth-child(3),
+        .calculator-table td:nth-child(3) {
+            min-width: 70px;
+        }
+
+        .calculator-table th:nth-child(4),
+        .calculator-table td:nth-child(4) {
+            min-width: 100px;
+        }
+
+        .calculator-table th:nth-child(5),
+        .calculator-table td:nth-child(5) {
+            min-width: 40px;
+        }
+
+        .session-select {
+            white-space: normal;
+            height: auto;
+            line-height: 1.4;
+        }
+
         .session-select, .price-input, .quantity-input {
             width: 100%;
-            padding: 8px;
+            padding: 8px 4px;
             border: 2px solid #e0e0e0;
             border-radius: 6px;
             font-family: 'Cairo', sans-serif;
             font-size: 14px;
             transition: border-color 0.3s ease;
+            text-align: center;
         }
         
         .session-select:focus, .price-input:focus, .quantity-input:focus {
@@ -593,7 +835,8 @@
             
             .session-select, .price-input, .quantity-input {
                 font-size: 12px;
-                padding: 6px;
+                padding: 6px 2px;
+                text-align: center;
             }
             
             .delete-btn {
@@ -632,7 +875,8 @@
             
             .session-select, .price-input, .quantity-input {
                 font-size: 11px;
-                padding: 4px;
+                padding: 4px 2px;
+                text-align: center;
             }
             
             .grand-total-container {
@@ -641,6 +885,39 @@
             
             .grand-total-value {
                 font-size: 18px;
+            }
+        }
+
+        /* Variations Layout */
+        .variations-wrapper {
+            display: flex;
+            gap: 20px;
+            margin-top: 24px;
+            width: 100%;
+            overflow-x: auto;
+            padding-bottom: 10px; /* Space for scrollbar */
+        }
+        
+        .variation-column {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .container.expanded-layout {
+            max-width: 1400px;
+        }
+
+        .variation-column .add-row-btn,
+        .variation-column .delete-btn {
+            visibility: hidden;
+        }
+
+        @media (max-width: 1100px) {
+            .variations-wrapper {
+                flex-direction: column;
+            }
+            .container.expanded-layout {
+                max-width: 600px;
             }
         }
         
@@ -829,20 +1106,22 @@
             <div class="calculator-content">
                 <button class="add-row-btn" onclick="addCalculatorRow()">+ إضافة جلسة جديدة</button>
                 
-                <table class="calculator-table">
-                    <thead>
-                        <tr>
-                            <th>نوع الجلسة</th>
-                            <th>السعر</th>
-                            <th>الكمية</th>
-                            <th>المجموع</th>
-                            <th>حذف</th>
-                        </tr>
-                    </thead>
-                    <tbody id="calculator-table-body">
-                        <!-- Rows will be added dynamically -->
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="calculator-table">
+                        <thead>
+                            <tr>
+                                <th>نوع الجلسة</th>
+                                <th>السعر</th>
+                                <th>الكمية</th>
+                                <th>المجموع</th>
+                                <th>حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calculator-table-body">
+                            <!-- Rows will be added dynamically -->
+                        </tbody>
+                    </table>
+                </div>
                 
                 <div class="grand-total-container">
                     <div class="grand-total-label">المجموع الكلي:</div>
@@ -852,6 +1131,8 @@
         </div>
         
         <div class="trademark"> Veles 2025 - جميع الحقوق محفوظة</div>
+        <button id="more-variations-btn" class="add-row-btn" style="margin-top: 20px; background: linear-gradient(135deg, #4caf50 0%, #81c784 100%);" onclick="showVariations()">More Variations</button>
+        <button id="reset-btn" class="add-row-btn" style="margin-top: 10px; background: linear-gradient(135deg, #f44336 0%, #e57373 100%);" onclick="resetAll()">Reset</button>
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
